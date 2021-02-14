@@ -1,0 +1,92 @@
+task : Install Ansible	
+
+Description:
+During their weekly meeting, the Nautilus DevOps team developed automation and configuration management solutions that they want to implement. While considering several options, the team has decided to go with Ansible for now due to its simple setup and minimal pre-requisites. The team wanted to start testing with Ansible, so they have decided to use jump host as an Ansible controller to test different kinds of tasks on the rest of the servers.
+
+
+Install ansible version 2.9.5 on Jump host.
+
+====================================
+solutions:
+1. check if software is installed - optional
+
+thor@jump_host /$ sudo yum repolist | grep epel
+ * epel: mirror.dogado.de
+epel/x86_64           Extra Packages for Enterprise Linux 7 - x86_64      13,520
+thor@jump_host /$ sudo yum repolist | grep ansible
+thor@jump_host /$ 
+
+or 
+sudo yum list ansible*
+
+thor@jump_host /$ yum list ansible*
+Loaded plugins: fastestmirror, ovl
+ovl: Error while doing RPMdb copy-up:
+[Errno 13] Permission denied: '/var/lib/rpm/Basenames'
+Loading mirror speeds from cached hostfile
+ * base: mirror.checkdomain.de
+ * epel: ftp.plusline.net
+ * extras: mirror.softaculous.com
+ * updates: ftp.plusline.net
+Installed Packages
+ansible.noarch                                 2.9.17-1.el7                            @epel
+Available Packages
+ansible-doc.noarch                             2.9.17-1.el7                            epel 
+ansible-inventory-grapher.noarch               2.4.4-1.el7                             epel 
+ansible-lint.noarch                            3.5.1-1.el7                             epel 
+ansible-openstack-modules.noarch               0-20140902git79d751a.el7                epel 
+ansible-python3.noarch                         2.9.17-1.el7                            epel 
+ansible-review.noarch                          0.13.4-1.el7                            epel 
+thor@jump_host /$ 
+
+2. install epel 
+sudo yum install epel-release -y 
+3.
+sudo yum install python-pip python-dev
+2.
+sudo yum install ansible -y
+3. to verify 
+thor@jump_host /$ ansible --version
+ansible 2.9.17
+  config file = /etc/ansible/ansible.cfg
+  configured module search path = [u'/home/thor/.ansible/plugins/modules', u'/usr/share/ansible/plugins/modules']
+  ansible python module location = /usr/lib/python2.7/site-packages/ansible
+  executable location = /usr/bin/ansible
+  python version = 2.7.5 (default, Jun 20 2019, 20:27:34) [GCC 4.8.5 20150623 (Red Hat 4.8.5-36)]
+thor@jump_host /$ 
+
+4. to remove
+sudo yum remove ansible
+or 
+sudo yum erase ansible
+
+above solution worked but the version is 2.9.17 not requested 2.9.5
+
+====================================
+PIP way to install specific version
+
+
+2. Install ansible version 2.6.10 on Jump host.
+
+
+sudo yum install epel-release -y
+     sudo yum install python-pip -y
+     sudo pip install ansible==2.6.10
+    ansible --version
+thor@jump_host /$ ansible --version
+ansible 2.5.7
+  config file = None
+  configured module search path = [u'/home/thor/.ansible/plugins/modules', u'/usr/share/ansible/plugins/modules']
+  ansible python module location = /usr/lib/python2.7/site-packages/ansible
+  executable location = /usr/bin/ansible
+  python version = 2.7.5 (default, Jun 20 2019, 20:27:34) [GCC 4.8.5 20150623 (Red Hat 4.8.5-36)]
+thor@jump_host /$ history
+
+
+2. to remove
+
+==> sudo yum erase python34-pip-8.1.2-14.el7.noarch
+
+==> sudo pip uninstall ansible
+
+successfully uninstalled ansible-2.5.0
