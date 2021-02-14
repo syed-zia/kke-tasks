@@ -90,3 +90,11 @@ thor@jump_host /$ history
 ==> sudo pip uninstall ansible
 
 successfully uninstalled ansible-2.5.0
+
+3., to check what is installed
+
+pip list
+
+4. to check out outdated
+
+pip list --outdated
