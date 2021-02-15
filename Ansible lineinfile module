@@ -21,3 +21,17 @@ The /var/www/html/index.html file's permissions should be 0655 on all app server
 Note: Validation will try to run playbook using command ansible-playbook -i inventory playbook.yml so please make sure playbook works this way, without passing any extra arguments.
 
 Solution:
+List of files under /home/thor/ansible:
+thor@jump_host ~/ansible$ ls -ltr
+total 8
+-rw-r--r-- 1 thor thor 237 Feb 15 16:37 inventory
+-rw-r--r-- 1 thor thor  36 Feb 15 16:37 ansible.cfg
+
+thor@jump_host ~/ansible$ cat in*
+stapp01 ansible_host=172.16.238.10 ansible_ssh_pass=Ir0nM@n ansible_user=tony
+stapp02 ansible_host=172.16.238.11 ansible_ssh_pass=Am3ric@ ansible_user=steve
+stapp03 ansible_host=172.16.238.12 ansible_ssh_pass=BigGr33n ansible_user=banner
+
+thor@jump_host ~/ansible$ cat a*
+[defaults]
+host_key_checking = False
