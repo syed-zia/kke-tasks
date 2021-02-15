@@ -61,16 +61,15 @@ thor@jump_host ~/ansible$ cat playbook.yml
        enabled: yes
 
    - name: Create a file index.html
-     file:
-       name: /var/www/html/index.html
-       state: touch
+     copy:
+       dest: /var/www/html/index.html
        content: |
-                 This is a Nautilus sample file, created using Ansible!
+         This is a Nautilus sample file, created using Ansible!
       
    - name: Add Welcome to message
      lineinfile:
         path: /var/www/html/index.html
-        line: 'Welcome to xFusionCorp Industries!'
+        line: 'Welcome to Nautilus Group!'
         insertbefore: BOF
 
    - name: File perm and group 
@@ -79,3 +78,8 @@ thor@jump_host ~/ansible$ cat playbook.yml
        group: apache
        owner: apache
        mode: 0655
+   ===========================
+   To run / deploy :
+   ansible-playbook -i inventory playbook.yml
+   
+   
