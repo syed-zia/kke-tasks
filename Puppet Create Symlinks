@@ -1,0 +1,34 @@
+Solution
+==========
+
+create a beta.pp with below content
+root@jump_host /etc/puppetlabs/code/environments/production/manifests# cat beta.pp 
+class symlink {
+
+  file { '/opt/itadmin':
+     ensure => 'link',
+     target => '/var/www/html',
+  }
+  file { '/opt/itadmin/story.txt':
+     ensure  => 'present',
+     replace => 'no', # this is the important property
+  }
+}
+
+node 'stapp01.stratos.xfusioncorp.com','stapp02.stratos.xfusioncorp.com','stapp03.stratos.xfusioncorp.com'{ 
+include symlink
+}
+
+node default{
+}  
+
+
+On master puppet server as root
+    9  puppet parser validate beta.pp # to check the syntax of the file beta.pp without executing code
+   12  puppet apply -v --noop beta.pp # to execute the code but without making the changes / permanent
+   13  puppet apply beta.pp # to apply the changes and execute the code
+   
+on the rest of the app servers , node servers, run as sudo 
+[steve@stapp02 itadmin]$ history
+    1  sudo puppet agent -tv
+    
