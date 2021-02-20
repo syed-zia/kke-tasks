@@ -1,0 +1,141 @@
+The Nautilus DevOps team is planning to set up a Jenkins CI server to create/manage some deployment pipelines for some of the projects. 
+They want to set up the Jenkins server on Kubernetes cluster. Below you can find more details about the task:
+
+
+1) Create namespace jenkins
+
+2) Create a Service for jenkins deployment. Service name should be jenkins-service under jenkins namespace, type should be NodePort, targetport should be 8080 and nodePort should be 30008
+
+3) Create a Jenkins Deployment under jenkins namespace, It should be name as jenkins-deployment , labels app should be jenkins , 
+container name should be jenkins-container , use jenkins image, containerPort should be 8080 and replicas count should be 1.
+
+Make sure to wait for pods to be in running state before clicking on Finish button.
+
+Note: The kubectl utility on jump_host has been configured to work with the kubernetes cluster.
+
+solution:
+==========
+
+# create namespace 
+
+==> kubectl create namespace jenkins
+
+# to create service as per the instructions
+
+Usage:
+  kubectl create service nodeport NAME [--tcp=port:targetPort] [--dry-run=server|client|none]
+[options]
+
+==> kubectl create service nodeport jenkins-service --tcp=30008:8080 --namespace=jenkins --dry-run=client -o yaml > /home/thor/srv.yml
+
+# to create deployment
+
+Usage:
+  kubectl create deployment NAME --image=image -- [COMMAND] [args...] [options]
+
+==> kubectl create deployment jenkins-deployment --image=jenkins --namespace=jenkins --dry-run=client -o yaml > dp.yml
+
+file:
+thor@jump_host ~$ cat *
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: jenkins
+  name: jenkins-deployment
+  namespace: jenkins
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: jenkins
+  strategy: {}
+  template:
+    metadata:
+      labels:
+        app: jenkins
+    spec:
+      containers:
+      - image: jenkins
+        name: jenkins-container
+        ports:
+        - containerPort: 8080
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: jenkins
+  name: jenkins-service
+  namespace: jenkins
+spec:
+  ports:
+  - name: jenkin 
+    port: 8080
+    protocol: TCP
+    targetPort: 8080
+    nodePort: 30008
+  selector:
+    app: jenkins
+  type: NodePort
+  
+  
+verification before :
+=============
+thor@jump_host ~$ kubectl get svc
+NAME         TYPE        CLUSTER-IP   EXTERNAL-IP   PORT(S)   AGE
+kubernetes   ClusterIP   10.96.0.1    <none>        443/TCP   65m
+thor@jump_host ~$ kubectl get svc --namespace=jenkins
+No resources found in jenkins namespace.
+thor@jump_host ~$ kubectl get pods --namespace=jenkins
+No resources found in jenkins namespace.
+thor@jump_host ~$ kubectl get nodes --namespace=jenkins
+NAME           STATUS   ROLES    AGE   VERSION
+controlplane   Ready    master   66m   v1.19.0
+node01         Ready    <none>   65m   v1.19.0
+thor@jump_host ~$ kubectl get deployments --namespace=jenkins
+No resources found in jenkins namespace.
+thor@jump_host ~$ 
+
+after:
+=====
+thor@jump_host ~$ kubectl describe deployment --namespace=jenkins
+Name:                   jenkins-deployment
+Namespace:              jenkins
+CreationTimestamp:      Sat, 20 Feb 2021 22:21:08 +0000
+Labels:                 app=jenkins
+Annotations:            deployment.kubernetes.io/revision: 1
+Selector:               app=jenkins
+Replicas:               1 desired | 1 updated | 1 total | 1 available | 0 unavailable
+StrategyType:           RollingUpdate
+MinReadySeconds:        0
+RollingUpdateStrategy:  25% max unavailable, 25% max surge
+Pod Template:
+  Labels:  app=jenkins
+  Containers:
+   jenkins-container:
+    Image:        jenkins
+    Port:         8080/TCP
+    Host Port:    0/TCP
+    Environment:  <none>
+    Mounts:       <none>
+  Volumes:        <none>
+Conditions:
+  Type           Status  Reason
+  ----           ------  ------
+  Available      True    MinimumReplicasAvailable
+  Progressing    True    NewReplicaSetAvailable
+OldReplicaSets:  <none>
+NewReplicaSet:   jenkins-deployment-ccd8b76f (1/1 replicas created)
+Events:
+  Type    Reason             Age   From                   Message
+  ----    ------             ----  ----                   -------
+  Normal  ScalingReplicaSet  78s   deployment-controller  Scaled up replica set jenkins-deployment-ccd8b76f to 1
+thor@jump_host ~$ kubectl get pods --namespace=jenkins
+NAME                                READY   STATUS    RESTARTS   AGE
+jenkins-deployment-ccd8b76f-d54jt   1/1     Running   0          87s
+thor@jump_host ~$ kubectl get deployment --namespace=jenkins
+NAME                 READY   UP-TO-DATE   AVAILABLE   AGE
+jenkins-deployment   1/1     1            1           100s
+thor@jump_host ~$ kubectl get svc --namespace=jenkins
+NAME              TYPE       CLUSTER-IP     EXTERNAL-IP   PORT(S)          AGE
+jenkins-service   NodePort   10.97.245.14   <none>        8080:30008/TCP   4m14s
