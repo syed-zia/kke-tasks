@@ -19,3 +19,8 @@ open the file using vi editor
 replace remote_user = root with remote_user = maryam
 
 save and quit.
+
+
+referene documentation
+
+https://github.com/ansible/ansible/blob/devel/examples/ansible.cfg
