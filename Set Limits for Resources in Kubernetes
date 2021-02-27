@@ -37,6 +37,7 @@ spec:
              cpu: "2m"
            requests:
              memory: "15Mi"
+             cpu: "1"
  2. to create the pod
     => kubectl create -f pod.yml
  3. to check the pod is running
