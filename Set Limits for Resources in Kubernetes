@@ -18,61 +18,63 @@ Note: The kubectl utility on jump_host has been configured to work with the kube
 solution:
 =============
 
+
 1. create the yml file with below content
 
-thor@jump_host ~$ cat pod.yml 
+Usage:
+  kubectl run NAME --image=image [--env="key=value"] [--port=port] [--dry-run=server|client]
+[--overrides=inline-json] [--command] -- [COMMAND] [args...] [options]
+
+
+kubectl run httpd-pod --image=httpd:latest --dry-run=client -o yaml > /home/thor/p.yml
+
 apiVersion: v1
 kind: Pod
 metadata:
   labels:
-    app: httpd
+    run: httpd
   name: httpd-pod
 spec:
-      containers:
-      - image: httpd:latest
-        name: httpd-container
-        resources: 
-           limits:
-             memory: "20Mi"
-             cpu: "2"
-           requests:
+  containers:
+  - image: httpd:latest
+    name: httpd-container
+    resources: 
+        limits:
+            memory: "20Mi"
+            cpu: "2"
+        requests:
              memory: "15Mi"
              cpu: "1"
+~                         
+
+
  2. to create the pod
     => kubectl create -f pod.yml
  3. to check the pod is running
    => kubectl get pods
  4. to check the limits and requests
    => kubectl describe nodes
-  5. kubectl describe pods 
-  
+  5. kubectl describe nodes 
+  Tips: set limits for cpu - shouldn't set 1m and 2m for the CPU, only 1 and 2. for memory use Mi.
   
   partial output of kubectl describe node 
   
-  
     Namespace                   Name                           CPU Requests  CPU Limits  Memory Requests  Memory Limits  AGE
   ---------                   ----                           ------------  ----------  ---------------  -------------  ---
-  default                     httpd-pod                      1m (0%)       2m (0%)     15Mi (0%)        20Mi (0%)      3m36s
-  kube-system                 kube-flannel-ds-amd64-xklm6    100m (5%)     100m (5%)   50Mi (1%)        50Mi (1%)      27m
-  kube-system                 kube-proxy-t4mfh               0 (0%)        0 (0%)      0 (0%)           0 (0%)         27m
+  default                     httpd-pod                      1 (50%)       2 (100%)    15Mi (0%)        20Mi (0%)      46s
+  kube-system                 kube-flannel-ds-amd64-kdnxt    100m (5%)     100m (5%)   50Mi (1%)        50Mi (1%)      8m38s
+  kube-system                 kube-proxy-2xptx               0 (0%)        0 (0%)      0 (0%)           0 (0%)         8m38s
 Allocated resources:
   (Total limits may be over 100 percent, i.e., overcommitted.)
-  Resource           Requests   Limits
-  --------           --------   ------
-  cpu                101m (5%)  102m (5%)
-  memory             65Mi (1%)  70Mi (1%)
-  ephemeral-storage  0 (0%)     0 (0%)
-  hugepages-1Gi      0 (0%)     0 (0%)
-  hugepages-2Mi      0 (0%)     0 (0%)
-Events:
-  Type    Reason                   Age                From        Message
-  ----    ------                   ----               ----        -------
-  Normal  Starting                 27m                kubelet     Starting kubelet.
-  Normal  NodeHasSufficientMemory  27m (x2 over 27m)  kubelet     Node node01 status is now: NodeHasSufficientMemory
-  Normal  NodeHasNoDiskPressure    27m (x2 over 27m)  kubelet     Node node01 status is now: NodeHasNoDiskPressure
-  Normal  NodeHasSufficientPID     27m (x2 over 27m)  kubelet     Node node01 status is now: NodeHasSufficientPID
-  Normal  NodeAllocatableEnforced  27m                kubelet     Updated Node Allocatable limit across pods
-  Normal  Starting                 27m                kube-proxy  Starting kube-proxy.
-  Normal  NodeReady                27m                kubelet     Node node01 status is now: NodeReady
+  Resource           Requests     Limits
+  --------           --------     ------
+  cpu                1100m (55%)  2100m (105%)
+  memory             65Mi (1%)    70Mi (1%)
+  ephemeral-storage  0 (0%)       0 (0%)
+  hugepages-1Gi      0 (0%)       0 (0%)
+  hugepages-2Mi      0 (0%)       0 (0%)
+  
+  
+
  
  
