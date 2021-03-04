@@ -1,0 +1,28 @@
+The Nautilus DevOps team has started practicing some pods and services deployment on Kubernetes platform as they are 
+planning to migrate most of their applications on Kubernetes platform. Recently one of the team members has been
+assigned a task to create a pod as per details mentioned below:
+
+
+Create a pod named pod-httpd using the image httpd with latest tag only and remember to mention tag i.e httpd:latest.
+
+Labels app should be named as httpd_app, also container should be named as httpd-container.
+
+Note: The kubectl utility on jump_host has been configured to work with the kubernetes cluster.
+
+
+solution:
+======
+
+
+==> kubectl run nginx --image=nginx --dry-run=client -o yaml > pod.yaml 
+edit the pod.yml by opening in vi mode. 
+finally execute the command to create the pod 
+==> kubectl create -f pod.yaml
+
+
+verify by running 
+==> 
+kubectl get pods 
+or 
+
+==> kubectl describe pods
