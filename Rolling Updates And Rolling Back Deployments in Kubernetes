@@ -22,9 +22,43 @@ k create deployment httpd-deploy --image=httpd:2.4.24 --namespace=datacenter --r
                   deployment name.      image.            namespace            replicas
                   
   k create deployment httpd-deploy --image=httpd:2.4.24 \ --namespace=datacenter --replicas=6 
+  
+  YAML file contents
+  
+  apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: httpd-deploy-1
+  name: httpd-deploy
+  namespace: datacenter
+spec:
+  replicas: 6
+  selector:
+    matchLabels:
+      app: httpd-deploy-1
+  strategy: 
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 2
+  template:
+    metadata:
+      labels:
+        app: httpd-deploy-1
+    spec:
+      containers:
+      - image: httpd:2.4.25
+        name: httpd
+        
+        
 to get deployment :
 
-=> Kubectl get deployments
+=> Kubectl get deployments --namespace=datacenter
+
+to list the pods
+
+Kubectl get pods --namespace=datacenter
 
 to describe deployment:
 
@@ -35,10 +69,19 @@ Rolling update command:
 
 => kubectl set image deployment/[deployment_name] nginx=nginx:[new_version]
 
+kubectl set image deployment/httpd-deploy httpd=httpd:2.4.43 --namespace=datacenter
+
+verify:
+thor@jump_host ~$ k get deployment --namespace=datacenter -o wide
+NAME           READY   UP-TO-DATE   AVAILABLE   AGE     CONTAINERS   IMAGES         SELECTOR
+httpd-deploy   6/6     6            6           5m41s   httpd        httpd:2.4.43   app=httpd-deploy-1
+
 
 to check the rollout status:
 
 => kubectl rollout status deployment/[deployment_name]
+
+kubectl rollout status deployment/httpd-deploy --namespace=datacenter
 
 
 Rolling Back The Kubernetes Deployment:
@@ -48,4 +91,13 @@ Rolling Back The Kubernetes Deployment:
 Rollout undo:
 
 => kubectl rollout undo deployment/nginx-deployment --to-revision=[revision_number]
+
+kubectl rollout undo deployment/httpd-deploy --namespace=datacenter --to-revision=1
+
+verify:
+
+get deployment --namespace=datacenter -o wide
+
+NAME           READY   UP-TO-DATE   AVAILABLE   AGE     CONTAINERS   IMAGES         SELECTOR
+httpd-deploy   6/6     6            6           7m37s   httpd        httpd:2.4.25   app=httpd-deploy-1
 
