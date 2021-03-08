@@ -13,3 +13,27 @@ Note: Please perform this task using games.pp only, do not create any separate i
 
 Solution:
 ==========
+step 1:
+
+    1  cd /etc/puppetlabs/code/environments/production/manifests
+    2  ls -ltr
+    3  cat > games.pp
+    4  vi games.pp 
+    5  puppet parser validate games.pp # validate the syntx
+    6  puppet apply games.pp # to apply the changes
+    7  history
+    
+    games.pp content
+node default {
+ # This is where you can declare classes for all nodes.
+package { httpd: ensure => installed; }
+}
+
+carry out the below steps on all the 3 appservers
+
+[banner@stapp03 ~]$ history
+    1  sudo systemctl status httpd # to check if httpd is installed, result will be false
+    2  sudo puppet agent -t
+    3  sudo systemctl status httpd # this time you will get output
+    4  history
+[banner@stapp03 ~]$ 
