@@ -15,19 +15,19 @@ Solution:
 ==========
 step 1:
 
-    1  cd /etc/puppetlabs/code/environments/production/manifests
-    2  ls -ltr
-    3  cat > games.pp
-    4  vi games.pp 
-    5  puppet parser validate games.pp # validate the syntx
-    6  puppet apply games.pp # to apply the changes
-    7  history
+    cd /etc/puppetlabs/code/environments/production/manifests
+    ls -ltr
+    vi games.pp 
     
-    games.pp content
 node default {
  # This is where you can declare classes for all nodes.
 package { httpd: ensure => installed; }
 }
+
+
+puppet parser validate games.pp # validate the syntax
+puppet apply games.pp # to apply the changes
+    
 
 carry out the below steps on all the 3 appservers
 
