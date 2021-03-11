@@ -54,22 +54,38 @@ ape-elasticsearch  Module for managing and configuring Elast...  @ape
 ULHPC-infiniband   Install and configure infiniband              @ULHPC        infiniband           
 root@jump_host /
 
+Alternate way to verify by running ```puppet module list```. see output below:
+
+root@jump_host /# puppet module list
+/etc/puppetlabs/code/environments/production/modules
+├── puppet-yum (v4.3.0)
+├── puppetlabs-concat (v6.4.0)
+├── puppetlabs-stdlib (v6.6.0)
+└── puppetlabs-translate (v2.2.0)
+/etc/puppetlabs/code/modules (no modules installed)
+/opt/puppetlabs/puppet/modules (no modules installed)
 
 task 2: 
 
 create a file games.pp with below content
 
-
-class yumgroup {
-
-  # list the available groups with yum grouplist
+#============================*Begining of Code file*==============
+class yum_group {
+  
   yum::group { 'Fedora Packager':
-    ensure  => present,
-    timeout => 300,
-  }
+  ensure => present,
+  timeout => 300,
+}
 
 }
 
+node 'stapp01.stratos.xfusioncorp.com', 'stapp02.stratos.xfusioncorp.com', 'stapp03.stratos.xfusioncorp.com' {
+  include yum_group
+}
+
+node default{
+}  
+#================*End of Code==========================
 run below to validate the syntax:
 
 => puppet parser validate games.pp
@@ -84,18 +100,19 @@ run below to apply the changes
 
 on below on the app servers 1, 2, 3
 
-=> puppet agent -t
+=> puppet agent -tv
 
 sudo yum group mark convert
 
 sudo yum search fedora
 sudo yum group summary | grep Installed
 sudo yum group list | grep Installed -A 1
-sudo yum group list | grep Installed -A 1
 sudo yum group list | grep -i Fedora
 sudo yum list | grep -i fedora
 
-
+[tony@stapp01 ~]$ sudo yum group list | grep Installed -A 1
+Installed Groups:
+   Fedora Packager
 
 [tony@stapp01 ~]$ history
     1  sudo puppet agent -t
