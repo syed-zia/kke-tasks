@@ -1,24 +1,25 @@
-The Nautilus DevOps team is planning to set up a Jenkins CI server to create/manage some deployment pipelines for some of the projects. 
-They want to set up the Jenkins server on Kubernetes cluster. Below you can find more details about the task:
+# The Nautilus DevOps team is planning to set up a Jenkins CI server to create/manage some deployment pipelines for some of the projects. 
+# They want to set up the Jenkins server on Kubernetes cluster. Below you can find more details about the task:
 
 
-1) Create namespace jenkins
+# 1) Create namespace jenkins
 
-2) Create a Service for jenkins deployment. Service name should be jenkins-service under jenkins namespace, type should be NodePort, targetport should be 8080 and nodePort should be 30008
+# 2) Create a Service for jenkins deployment. Service name should be jenkins-service under jenkins namespace, type should be NodePort, 
+# targetport should be 8080 and nodePort should be 30008
 
-3) Create a Jenkins Deployment under jenkins namespace, It should be name as jenkins-deployment , labels app should be jenkins , 
-container name should be jenkins-container , use jenkins image, containerPort should be 8080 and replicas count should be 1.
+# 3) Create a Jenkins Deployment under jenkins namespace, It should be name as jenkins-deployment , labels app should be jenkins , 
+# container name should be jenkins-container , use jenkins image, containerPort should be 8080 and replicas count should be 1.
 
-Make sure to wait for pods to be in running state before clicking on Finish button.
+# Make sure to wait for pods to be in running state before clicking on Finish button.
 
-Note: The kubectl utility on jump_host has been configured to work with the kubernetes cluster.
+# Note: The kubectl utility on jump_host has been configured to work with the kubernetes cluster.
 
 solution:
 ==========
 
 # create namespace 
 
-==> kubectl create namespace jenkins
+kubectl create namespace jenkins
 
 # to create service as per the instructions
 
@@ -26,7 +27,7 @@ Usage:
   kubectl create service nodeport NAME [--tcp=port:targetPort] [--dry-run=server|client|none]
 [options]
 
-==> kubectl create service nodeport jenkins-service --tcp=30008:8080 --namespace=jenkins --dry-run=client -o yaml > /home/thor/srv.yml
+kubectl create service nodeport jenkins-service --tcp=30008:8080 --namespace=jenkins --dry-run=client -o yaml > /home/thor/srv.yml
 
 # to create deployment
 
@@ -79,7 +80,7 @@ spec:
   type: NodePort
   
   
-verification before :
+# verification before :
 =============
 thor@jump_host ~$ kubectl get svc
 NAME         TYPE        CLUSTER-IP   EXTERNAL-IP   PORT(S)   AGE
@@ -96,7 +97,7 @@ thor@jump_host ~$ kubectl get deployments --namespace=jenkins
 No resources found in jenkins namespace.
 thor@jump_host ~$ 
 
-after:
+# verification after:
 =====
 thor@jump_host ~$ kubectl describe deployment --namespace=jenkins
 Name:                   jenkins-deployment
