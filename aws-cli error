@@ -1,0 +1,31 @@
+Issue : AWS CLI: SSL Validation Failed 
+Description: when you attempt to connect to AWS account using AWS CLI, especially when trying to list the s3 buckets etc.
+
+Resolution:
+
+
+
+SSL validation failed for <endpoint_url> [SSL: CERTIFICATE_VERIFY_FAILED] certificate verify failed
+
+To workaround the issue you can add the --no-verify-ssl option to the AWS CLI:
+
+$ aws s3 ls --no-verify-ssl
+But this is not secure and will cause the following warning:
+
+InsecureRequestWarning: Unverified HTTPS request is being made.
+Adding certificate verification is strongly advised. See: https://urllib3.readthedocs.io/en/latest/advanced-usage.html#ssl-warnings
+
+
+
+
+This can be done by setting the AWS_CA_BUNDLE environment variable.
+
+Linux:
+$ export AWS_CA_BUNDLE="/data/ca-certs/ca-bundle.pem"
+
+
+
+$ nano ~/aws/.config
+$ cat ~/aws/.config
+[default]
+ca_bundle = /data/ca-certs/ca-bundle.pem
