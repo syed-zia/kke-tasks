@@ -1,0 +1,90 @@
+he Nautilus DevOps team is trying to setup a simple Apache web server on all app servers in Stratos DC using Ansible. They also want to create a sample html page for now with some app specific data on it. Below you can find more details about the task.
+
+
+You will find a valid inventory file /home/thor/playbooks/inventory on jump host (which we are using as an Ansible controller).
+
+Create a playbook index.yml under /home/thor/playbooks directory on jump host. Using blockinfile Ansible module create a file facts.txt 
+under /root directory on all app servers and add the following given block in it. You will need to enable fact gathering for this task.
+Ansible managed node IP is <default ipv4 address>
+(You can obtain default ipv4 address from Ansible's gathered facts by using correct the Ansible variable taking into account Jinja2 syntax)
+
+Install httpd server on all apps. After that make a copy of facts.txt file as index.html under /var/www/html. Make sure to start httpd service after that.
+Note: Do not create a separate role for this task, just add all changes in index.yml playbook.
+
+
+ 
+
+
+
+thor@jump_host ~/playbooks$ ansible-playbook -i inventory index.yml
+
+PLAY [Install HTTPD] ***************************************************************************************************************************
+
+TASK [Gathering Facts] *************************************************************************************************************************
+ok: [stapp01]
+ok: [stapp02]
+ok: [stapp03]
+
+TASK [Create file facts.txt with content] ******************************************************************************************************
+ok: [stapp02]
+ok: [stapp03]
+ok: [stapp01]
+
+TASK [Install Httpd] ***************************************************************************************************************************
+ok: [stapp01]
+ok: [stapp02]
+ok: [stapp03]
+
+TASK [Start and enable service httpd] **********************************************************************************************************
+ok: [stapp01]
+ok: [stapp02]
+ok: [stapp03]
+
+TASK [copy] ************************************************************************************************************************************
+changed: [stapp03]
+changed: [stapp01]
+changed: [stapp02]
+
+PLAY RECAP *************************************************************************************************************************************
+stapp01                    : ok=5    changed=1    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0   
+stapp02                    : ok=5    changed=1    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0   
+stapp03                    : ok=5    changed=1    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0   
+
+thor@jump_host ~/playbooks$ ls -ltr
+total 12
+-rw-r--r-- 1 thor thor 237 Mar 17 19:04 inventory
+-rw-r--r-- 1 root root  36 Mar 17 19:04 ansible.cfg
+-rw-rw-r-- 1 thor thor 941 Mar 17 19:43 index.yml
+thor@jump_host ~/playbooks$ cat index.yml 
+---
+- name: Install HTTPD 
+  hosts:  all
+  become: yes
+  
+  tasks: 
+    - name: Create file facts.txt with content
+      blockinfile:
+        path: /root/facts.txt
+        state: present
+        create: yes
+        block: |
+          Ansible managed node IP is "{{ ansible_host }}"
+    
+    - name: Install Httpd
+      yum: 
+         name: httpd
+         state: latest
+    
+    - name: Start and enable service httpd
+      service: 
+        name: httpd
+        enabled: yes
+        state: started
+   
+  
+    - name:
+      copy:
+       src: /root/facts.txt
+       dest: /var/www/html/index.html
+       remote_src: yes
+  Note: remote_src - flag will let you look for file on master if it "no", "yes" it will look on remote machine.
