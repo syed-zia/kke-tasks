@@ -62,6 +62,7 @@ thor@jump_host ~/playbooks$ cat index.yml
 - name: Install HTTPD 
   hosts:  all
   become: yes
+  gathering_facts: yes
   
   tasks: 
     - name: Create file facts.txt with content
@@ -76,6 +77,12 @@ thor@jump_host ~/playbooks$ cat index.yml
       yum: 
          name: httpd
          state: latest
+         
+    - name: Copy the file facts.txt to dest on remote machine.
+      copy:
+       src: /root/facts.txt
+       dest: /var/www/html/index.html
+       remote_src: yes
     
     - name: Start and enable service httpd
       service: 
@@ -84,11 +91,7 @@ thor@jump_host ~/playbooks$ cat index.yml
         state: started
    
   
-    - name:
-      copy:
-       src: /root/facts.txt
-       dest: /var/www/html/index.html
-       remote_src: yes
+
        
   Note: 
   remote_src - flag will let you look for file on master if it "no", "yes" it will look on remote machine.
