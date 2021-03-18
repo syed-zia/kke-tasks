@@ -1,4 +1,5 @@
-he Nautilus DevOps team is trying to setup a simple Apache web server on all app servers in Stratos DC using Ansible. They also want to create a sample html page for now with some app specific data on it. Below you can find more details about the task.
+he Nautilus DevOps team is trying to setup a simple Apache web server on all app servers in Stratos DC using Ansible. 
+They also want to create a sample html page for now with some app specific data on it. Below you can find more details about the task.
 
 
 You will find a valid inventory file /home/thor/playbooks/inventory on jump host (which we are using as an Ansible controller).
@@ -66,9 +67,9 @@ thor@jump_host ~/playbooks$ cat index.yml
       blockinfile:
         path: /root/facts.txt
         state: present
-        create: yes
+        create: true
         block: |
-          Ansible managed node IP is "{{ ansible_host }}"
+          Ansible managed node IP is "{{ansible_default_ipv4.address}}"
     
     - name: Install Httpd
       yum: 
@@ -87,4 +88,8 @@ thor@jump_host ~/playbooks$ cat index.yml
        src: /root/facts.txt
        dest: /var/www/html/index.html
        remote_src: yes
-  Note: remote_src - flag will let you look for file on master if it "no", "yes" it will look on remote machine.
+       
+  Note: 
+  remote_src - flag will let you look for file on master if it "no", "yes" it will look on remote machine.
+  So your line should rather be coded as Ansible managed node IP is "{{ansible_default_ipv4.address}}" , not ansible_host.
+  in blockinfile section you must create an empty file "facts.txt" ( if it does not, exist ) with : create: true (instead of create: yes)
