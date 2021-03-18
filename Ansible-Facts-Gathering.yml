@@ -15,7 +15,8 @@ Note: Do not create a separate role for this task, just add all changes in index
 
  
 
-
+=> dry run command
+$ ansible-playbook -i inventory index.yml
 
 thor@jump_host ~/playbooks$ ansible-playbook -i inventory index.yml
 
@@ -69,7 +70,7 @@ thor@jump_host ~/playbooks$ cat index.yml
         state: present
         create: true
         block: |
-          Ansible managed node IP is "{{ansible_default_ipv4.address}}"
+          "Ansible managed node IP is {{ansible_default_ipv4.address}}"
     
     - name: Install Httpd
       yum: 
