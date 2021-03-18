@@ -16,7 +16,7 @@ Note: Do not create a separate role for this task, just add all changes in index
  
 
 => dry run command
-$ ansible-playbook -i inventory index.yml
+$ ansible-playbook -i inventory index.yml --check
 
 thor@jump_host ~/playbooks$ ansible-playbook -i inventory index.yml
 
@@ -62,7 +62,7 @@ thor@jump_host ~/playbooks$ cat index.yml
 - name: Install HTTPD 
   hosts:  all
   become: yes
-  gathering_facts: yes
+  gather_facts: true
   
   tasks: 
     - name: Create file facts.txt with content
@@ -95,5 +95,5 @@ thor@jump_host ~/playbooks$ cat index.yml
        
   Note: 
   remote_src - flag will let you look for file on master if it "no", "yes" it will look on remote machine.
-  So your line should rather be coded as Ansible managed node IP is "{{ansible_default_ipv4.address}}" , not ansible_host.
+  So your line should rather be coded as "Ansible managed node IP is {{ansible_default_ipv4.address}}" , not ansible_host.
   in blockinfile section you must create an empty file "facts.txt" ( if it does not, exist ) with : create: true (instead of create: yes)
