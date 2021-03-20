@@ -25,3 +25,6 @@ Docker Compose define the services that make up your app in docker-compose.yml s
 It get an app running in one command by just running docker-compose up.
 Docker compose uses the Dockerfile if one add the build command to your project’s docker-compose.yml. 
 Your Docker workflow should be to build a suitable Dockerfile for each image you wish to create, then use compose to assemble the images using the build command.
+
+
+docker run -d -it --rm -p  5000:80 --name www alpine-node:v1
