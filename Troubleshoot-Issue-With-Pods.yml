@@ -20,3 +20,15 @@ kubectl edit pod webserver # corrected the typo httpd:latests to httpd:latest
 kubectl describe pods 
 # to enter into the pod 
 kubectl exec -i -t webserver --container sidecar-container -- /bin/bash
+
+
+# Once the pod is running:
+#   
+#   (Connect to the sidecar pod)
+#   kubectl exec webserver -c sidecar-container -it bash
+#   
+#   (Install curl on the sidecar)
+#   apt-get update && apt-get install curl
+#   
+#   (Access the log file via the sidecar)
+#   curl 'http://localhost:80/app.txt'
