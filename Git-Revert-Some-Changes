@@ -1,0 +1,104 @@
+The Nautilus application development team was working on a git repository /usr/src/kodekloudrepos/games present on Storage server in Stratos DC. 
+However, they reported an issue with the recent commits being pushed to this repo. They have asked the DevOps team to revert repo HEAD to last commit. 
+Below are more details about the task:
+
+
+In /usr/src/kodekloudrepos/games git repository, revert the latest commit ( HEAD ) 
+to the previous commit (JFYI the previous commit hash should be with initial commit message ).
+
+Use revert games message (please use all small letters for commit message) for the new revert commit.
+
+SOlution:
+
+
+ssh connect to  storage server:
+-------------------------------
+ssh -l  natasha  ststor01
+
+sudo -i
+
+cd /usr/src/kodekloudrepos/blog
+
+list the files in the directory , there is only 1 file games.txt
+[root@ststor01 games]# cat games.txt
+These changes should be reverted
+
+check the status
+=================
+
+[root@ststor01 games]# git status
+# On branch master
+# Untracked files:
+#   (use "git add <file>..." to include in what will be committed)
+#
+#       games.txt
+nothing added to commit but untracked files present (use "git add" to track)
+
+git log 
+=======
+
+[root@ststor01 games]# git log
+commit 5f5ca0d11230ee10d7788aa6e92209a84f7d8c19
+Author: Admin <admin@kodekloud.com>
+Date:   Fri Mar 26 21:59:12 2021 +0000
+
+    add data.txt file
+
+commit 16ead179311b3adb01a08dae2cca2a0957536eec
+Author: Admin <admin@kodekloud.com>
+Date:   Fri Mar 26 21:59:12 2021 +0000
+
+    initial commit
+[root@ststor01 games]# 
+
+revert change:
+-------------
+git revert 5f5ca0d11230ee10d7788aa6e92209a84f7d8c19
+
+<quit  vi edition mode :q>                ### do  not insert any message in the file
+
+[master 8805c90] Revert "add data.txt file"
+ 1 file changed, 1 insertion(+)
+ create mode 100644 info.txt
+
+
+[root@ststor01 games]# git revert 5f5ca0d11230ee10d7788aa6e92209a84f7d8c19
+[master 4c26661] Revert "add data.txt file"
+ 1 file changed, 1 insertion(+)
+ create mode 100644 info.txt
+ 
+ git commit 
+ ==========
+ 
+[root@ststor01 games]# git commit --amend  -m  "revert games"
+[master ec68cb4] revert games
+ 1 file changed, 1 insertion(+)
+ create mode 100644 info.txt
+ 
+ git log status
+ ==============
+[root@ststor01 games]# git log
+commit ec68cb40f156d5c68780a5938626bba8f1d38bb9
+Author: Admin <admin@kodekloud.com>
+Date:   Fri Mar 26 22:02:42 2021 +0000
+
+    revert games
+
+commit 5f5ca0d11230ee10d7788aa6e92209a84f7d8c19
+Author: Admin <admin@kodekloud.com>
+Date:   Fri Mar 26 21:59:12 2021 +0000
+
+    add data.txt file
+
+commit 16ead179311b3adb01a08dae2cca2a0957536eec
+Author: Admin <admin@kodekloud.com>
+Date:   Fri Mar 26 21:59:12 2021 +0000
+
+    initial commit
+    
+[root@ststor01 games]# ls
+games.txt  info.txt
+
+# Now there are 2 files in the same directory
+[root@ststor01 games]# cat info.txt
+Welcome to xFusionCorp Industries
