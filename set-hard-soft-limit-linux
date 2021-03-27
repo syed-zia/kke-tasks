@@ -1,0 +1,27 @@
+
+
+On our Storage server in Stratos Datacenter we are having some issues where nfsuser user is holding hundred of processes, 
+which is degrading the performance of the server. Therefore, we have a requirement to limit its maximum processes. 
+Please set its maximum process limits as below:
+
+
+a. soft limit = 75
+
+b. hard_limit = 96
+
+solution:
+
+– To view soft limits, use the below command:
+
+# ulimit -u -S
+– Similarly, to view hard limits, use the below command:
+
+# ulimit -u -H
+
+set the limit in the file:
+
+# cat /etc/security/limits.conf | grep nproc | grep -v ^#
+test hard nproc 2047
+test soft nproc 16384
+
+https://www.thegeekdiary.com/how-to-set-nproc-hard-and-soft-values-in-centos-rhel-567/
