@@ -1,0 +1,90 @@
+
+Some new developers have joined xFusionCorp Industries and have been assigned Nautilus project.
+They are going to start development on a new application, and some pre-requisites have been shared with the DevOps team to proceed with.
+Please note that all tasks need to be performed on storage server in Stratos DC.
+
+
+a. Install git, set up any values for user.email and user.name globally and create a bare repository /opt/news.git.
+
+b. There is an update hook (to block direct pushes to master branch) under /tmp on storage server itself;
+use the same to block direct pushes to master branch in /opt/news.git repo.
+
+c. Clone /opt/news.git repo in /usr/src/kodekloudrepos/news directory.
+
+d. Create a new branch xfusioncorp_news in repo that you cloned in /usr/src/kodekloudrepos.
+
+e. There is a readme.md file in /tmp on storage server itself; copy that to repo, add/commit in the new branch you created, and finally push your branch to origin.
+
+f. Also create master branch from your branch and remember you should not be able to push to master as per hook you have set up.
+
+ 
+ 
+ Solution:
+ 
+ [root@ststor01 tmp]# history
+  sudo yum install git -y
+
+  yum search git
+  yum list | grep git
+  
+  git --version
+
+[natasha@ststor01 ~]$ git config user.name
+[natasha@ststor01 ~]$ git config --global user.name "John Doe"
+[natasha@ststor01 ~]$ git config user.name
+John Doe
+[natasha@ststor01 ~]$ git config --global user.email "John.Doe@something.com"
+
+[natasha@ststor01 ~]$ git config user.email
+John.Doe@something.com
+
+[natasha@ststor01 ~]$ git config --list
+user.name=John Doe
+user.email=John.Doe@something.com
+
+[natasha@ststor01 opt]$ sudo git init --bare --shared=group news.git
+Initialized empty shared Git repository in /opt/news.git/
+
+[natasha@ststor01 opt]$ ls -ltr
+total 4
+drwxrwsr-x 7 root root 4096 Mar 30 22:24 news.git
+[natasha@ststor01 opt]$ pwd
+/opt
+
+[natasha@ststor01 opt]$ cd news.git
+[natasha@ststor01 news.git]$ ls -ltr
+total 32
+drwxrwsr-x 4 root root 4096 Mar 30 22:24 refs
+drwxrwsr-x 4 root root 4096 Mar 30 22:24 objects
+drwxrwsr-x 2 root root 4096 Mar 30 22:24 info
+drwxrwsr-x 2 root root 4096 Mar 30 22:24 hooks
+-rw-rw-r-- 1 root root   23 Mar 30 22:24 HEAD
+-rw-rw-r-- 1 root root   73 Mar 30 22:24 description
+-rw-rw-r-- 1 root root  126 Mar 30 22:24 config
+drwxrwsr-x 2 root root 4096 Mar 30 22:24 branches
+[natasha@ststor01 news.git]$ 
+
+
+[natasha@ststor01 opt]$ sudo git clone /opt/news.git /usr/src/kodekloudrepos/news
+Cloning into '/usr/src/kodekloudrepos/news'...
+warning: You appear to have cloned an empty repository.
+done.
+[natasha@ststor01 opt]$ 
+
+
+
+
+[natasha@ststor01 hooks]$ sudo cp /tmp/update .
+[natasha@ststor01 hooks]$ ls -ltr
+total 44
+-rwxr-xr-x 1 root root 3611 Mar 30 22:27 update.sample
+-rwxr-xr-x 1 root root 4951 Mar 30 22:27 pre-rebase.sample
+-rw-r--r-- 1 root root 1348 Mar 30 22:27 pre-push.sample
+-rwxr-xr-x 1 root root 1239 Mar 30 22:27 prepare-commit-msg.sample
+-rwxr-xr-x 1 root root 1704 Mar 30 22:27 pre-commit.sample
+-rwxr-xr-x 1 root root  398 Mar 30 22:27 pre-applypatch.sample
+-rwxr-xr-x 1 root root  189 Mar 30 22:27 post-update.sample
+-rwxr-xr-x 1 root root  896 Mar 30 22:27 commit-msg.sample
+-rwxr-xr-x 1 root root  452 Mar 30 22:27 applypatch-msg.sample
+-rwxr-xr-x 1 root root  127 Mar 30 22:30 update
+[natasha@ststor01 hooks]$ 
