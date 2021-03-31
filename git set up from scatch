@@ -48,8 +48,10 @@ sudo git commit -m "add readme"
 sudo git push origin xfusioncorp_blog
 
 Task f:
-sudo git checkout master 
+sudo git checkout -b master 
 sudo touch test-file 
 sudo git add --all 
 sudo git commit -m "test if master can checkin" 
-sudo git push origin master
+sudo git push origin master # it should fail if you have set up as per the task requirement
+
+
