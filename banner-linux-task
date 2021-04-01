@@ -1,0 +1,32 @@
+Update the `message of the day` on all the applications and db server for Nautilus. Make use of the approved template located at /home/thor/nautilus_banner on jump host.
+
+
+Solution:
+
+1)sudo scp -r /tmp/nautilus_banner tony@172.16.238.10:/tmp
+ssh tony@stapp01
+cd /tmp
+sudo mv nautilus_banner /etc/motd
+repeat above for all 3 app servers
+
+Now db server, connect and install openssh.
+
+1)ssh peter@172.16.239.10
+sudo yum install openssh-clients –y
+----------------------------------------------
+
+Alternatively, you can use below command to execute task.
+
+ 
+----------------------------------------------
+1. yum -y install openssh-server openssh-clients
+   exit
+
+2. sudo scp -r /tmp/nautilus_banner peter@172.16.239.10:/tmp
+3.   ssh peter@stdb01
+    cd /tmp
+   sudo mv nautilus_banner /etc/motd
+   sudo systemctl start sshd
+4. now ssh tony@stapp01, ssh steve@stapp02, ssh banner@stapp03, ssh peter@stdb01.
+
+5. upon login you should see Nautilus_banner for all 3 app servers and 1 db server
