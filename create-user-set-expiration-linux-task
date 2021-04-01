@@ -1,0 +1,12 @@
+Create a user named "anita" on the app server 3. Set Expiry date to 2021-02-17 in Stratos DataCenter.
+Make sure the user created as per standard and is in lowercase
+
+Solution:
+
+1. Run below command to create the user with expiration date.
+
+sudo useradd –e 2021-02-17 anita
+
+2. To verify , please run which will display Last password change, Password inactive , password expires, Account expires , min / max no of days between password change:
+
+chage -l anita 
