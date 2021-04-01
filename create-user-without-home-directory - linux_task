@@ -1,0 +1,16 @@
+The system admins team of xFusionCorp Industries has set up a new tool on all app servers, as they have a requirement to create a service user account that will 
+be used by that tool. They are finished with all apps except for App 1 in Stratos Datacenter.
+
+Task 1 - Create a user named ammar in App Server 1 without a home directory.
+
+Solution:
+ 
+ to create the user ammar 
+ 
+ login to the box and fire the below command:
+ 
+ useradd -M ammar
+ 
+ to verify, you should see an entry : 
+ cat /etc/passwd | grep ammar 
+
