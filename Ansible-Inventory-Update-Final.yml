@@ -41,10 +41,10 @@ contents of the file , playbook.yml :
         name: httpd
         state: started
 
-to check the syntax / Dry run :
+3. to check the syntax / Dry run :
 
 ```ansible-playbook -i inventory playbook.yml --check```
 
-Finally run to execute :
+4. Finally run to execute :
 
 ansible-playbook -i inventory playbook.yml --check
