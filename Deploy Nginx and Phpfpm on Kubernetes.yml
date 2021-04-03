@@ -1,0 +1,202 @@
+The Nautilus Application team is planning to deploy one of the php-based application on Kubernetes cluster.
+As per discussion with DevOps team they decided to use nginx and phpfpm. Additionally, they shared some custom configuration requirements. 
+Below you can find more details. Please complete the task as per requirements mentioned below:
+
+
+1.) Create a config map nginx-config for nginx.conf as we want to add some custom settings for nginx.conf.
+
+a) Change default port 80 to 8092 in nginx.conf.
+
+b) Change default document root /usr/share/nginx to /var/www/html in nginx.conf.
+
+c) Update directory index to index index.html index.htm index.php in nginx.conf.
+
+
+
+
+b) Create a shared files volume shared-files that will be used by both containers (nginx and phpfpm) also it should be emptyDir: {}
+
+c) Map the ConfigMap we declared above as a volume for the pod. Name the volume as nginx-config-volume
+
+d) Nginx container should be named as nginx-container and it should use nginx:latest image. PhpFPM container should be named as php-fpm-container and it should use php:7.2-fpm image.
+
+e) The shared volume shared-files should be mounted at /var/www/html location in both containers.
+
+f) Add one more volume for nginx-container. Name it as nginx-config-volume, mount path should be /etc/nginx/nginx.conf and subPath should be nginx.conf
+
+Before clicking on finish button always make sure to check if all pods are in running state.
+
+You can use any labels as per your choice.
+
+Note: The kubectl utility on jump_host has been configured to work with the kubernetes cluster.
+
+
+Solution :
+
+1. cd /home/thor
+2. to create configmap with basic skeletoon structure run below:
+
+kubectl create configmap nginx-config --dry-run=server -o yaml > 1.yml
+
+3. Modify the 1.yml file to meet the task requirement. 
+
+
+4. to create pod with basic skeleton which needs to be modified to suit the task requirement :
+
+kubectl run nginx-phpfpm --image=nginx:latest --dry-run=server -o yaml > 2.yml
+
+Contents of the 1.yml file for configmap below:
+
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: nginx-config
+  namespace: default
+data:
+  nginx.conf: |
+    events {
+    }
+    http {
+      server {
+          listen       8097 default_server ;
+          listen [::]:8096 default_server;
+          root /var/www/html;
+          index index.html index.htm index.php
+          server_name  localhost;
+          location / {
+            try_files $uri $uri/ =404;
+          }
+          location ~ \.php$ {
+            include fastcgi_params;
+            fastcgi_param REQUEST_METHOD $request_method;
+            fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
+            fastcgi_pass 127.0.0.1:9000;
+          }
+         }
+      }
+---------------------------------------------------------------------
+File for pod 2.yml which after modification looks like below:
+---------------------------------------------------------------------
+apiVersion: v1
+kind: Pod
+metadata:
+  labels:
+  name: nginx-phpfpm
+  namespace: default
+spec:
+  volumes:
+  - name: shared-files
+    emptyDir: {}
+  - name: nginx-config-volume
+    configMap:
+      name: nginx-config
+  containers:
+  - image: php:7.0-fpm
+    name: php-fpm-container
+    volumeMounts:
+    - name: shared-files
+      mountPath: /var/www/html
+
+  - image: nginx:latest
+    imagePullPolicy: Always
+    name: nginx-container
+    volumeMounts:
+    - mountPath: /etc/nginx/nginx.conf
+      name: nginx-config-volume
+      subPath: nginx.conf
+    - name: shared-files
+      mountPath: /var/www/html
+
+
+-----------------------
+
+Verification steps below:
+---------------------
+thor@jump_host ~$ kubectl get pods
+NAME           READY   STATUS    RESTARTS   AGE
+nginx-phpfpm   2/2     Running   0          47s
+thor@jump_host ~$ kubectl get pods -o wide
+NAME           READY   STATUS    RESTARTS   AGE   IP           NODE     NOMINATED NODE   READINESS GATES
+nginx-phpfpm   2/2     Running   0          55s   10.244.1.2   node01   <none>           <none>
+thor@jump_host ~$ kubectl get nodes
+NAME           STATUS   ROLES    AGE   VERSION
+controlplane   Ready    master   22m   v1.19.0
+node01         Ready    <none>   22m   v1.19.0
+
+thor@jump_host ~$ kubectl describe pods
+Name:         nginx-phpfpm
+Namespace:    default
+Priority:     0
+Node:         node01/172.17.0.17
+Start Time:   Sat, 03 Apr 2021 17:40:33 +0000
+Labels:       <none>
+Annotations:  <none>
+Status:       Running
+IP:           10.244.1.2
+IPs:
+  IP:  10.244.1.2
+Containers:
+  php-fpm-container:
+    Container ID:   docker://423e6bf9f3b07ebfa888dea4dda0b341bad4bd9f0bc81de3876a07e2d6d1e96e
+    Image:          php:7.0-fpm
+    Image ID:       docker-pullable://php@sha256:8e8644c0fd61424939fff072ca617469550bbb659158301a2dcadf334746a1c2
+    Port:           <none>
+    Host Port:      <none>
+    State:          Running
+      Started:      Sat, 03 Apr 2021 17:40:55 +0000
+    Ready:          True
+    Restart Count:  0
+    Environment:    <none>
+    Mounts:
+      /var/run/secrets/kubernetes.io/serviceaccount from default-token-rdhjd (ro)
+      /var/www/html from shared-files (rw)
+  nginx-container:
+    Container ID:   docker://88d3dcf8aba9250d84a5b4100c9f8c76e4cb2803ed5c2db273d1bdd76fa070af
+    Image:          nginx:latest
+    Image ID:       docker-pullable://nginx@sha256:bae781e7f518e0fb02245140c97e6ddc9f5fcf6aecc043dd9d17e33aec81c832
+    Port:           <none>
+    Host Port:      <none>
+    State:          Running
+      Started:      Sat, 03 Apr 2021 17:41:03 +0000
+    Ready:          True
+    Restart Count:  0
+    Environment:    <none>
+    Mounts:
+      /etc/nginx/nginx.conf from nginx-config-volume (rw,path="nginx.conf")
+      /var/run/secrets/kubernetes.io/serviceaccount from default-token-rdhjd (ro)
+      /var/www/html from shared-files (rw)
+Conditions:
+  Type              Status
+  Initialized       True 
+  Ready             True 
+  ContainersReady   True 
+  PodScheduled      True 
+Volumes:
+  shared-files:
+    Type:       EmptyDir (a temporary directory that shares a pod's lifetime)
+    Medium:     
+    SizeLimit:  <unset>
+  nginx-config-volume:
+    Type:      ConfigMap (a volume populated by a ConfigMap)
+    Name:      nginx-config
+    Optional:  false
+  default-token-rdhjd:
+    Type:        Secret (a volume populated by a Secret)
+    SecretName:  default-token-rdhjd
+    Optional:    false
+QoS Class:       BestEffort
+Node-Selectors:  <none>
+Tolerations:     node.kubernetes.io/not-ready:NoExecute op=Exists for 300s
+                 node.kubernetes.io/unreachable:NoExecute op=Exists for 300s
+Events:
+  Type    Reason     Age   From               Message
+  ----    ------     ----  ----               -------
+  Normal  Scheduled  68s   default-scheduler  Successfully assigned default/nginx-phpfpm to node01
+  Normal  Pulling    66s   kubelet            Pulling image "php:7.0-fpm"
+  Normal  Pulled     48s   kubelet            Successfully pulled image "php:7.0-fpm" in 17.914457019s
+  Normal  Created    46s   kubelet            Created container php-fpm-container
+  Normal  Started    46s   kubelet            Started container php-fpm-container
+  Normal  Pulling    46s   kubelet            Pulling image "nginx:latest"
+  Normal  Pulled     40s   kubelet            Successfully pulled image "nginx:latest" in 6.515630046s
+  Normal  Created    38s   kubelet            Created container nginx-container
+  Normal  Started    38s   kubelet            Started container nginx-container
