@@ -1,0 +1,85 @@
+The Nautilus DevOps team was auditing some of the applications running on all app servers in Stratos Datacenter.
+They found some security loopholes-for example, they observed that there is no firewall installed on these apps. 
+So, the team has decided to install firewalld on all App Servers. Some rules need to be added.
+This task needs to be done using Puppet; please complete the task per the following details:
+
+
+Create an inventory file data.pp under /etc/puppetlabs/code/environments/production/manifests directory on Puppet master node i.e on Jump Server.
+In this inventory file you need to define node specific classes only which are mentioned below.
+
+Define a class firewall_node1 for agent node 1 i.e App Server 1, firewall_node2 for agent node 2 i.e App Server 2, firewall_node3 and for agent node3 i.e App Server 3.
+Also create a Puppet programming file demo.pp under /etc/puppetlabs/code/environments/production/manifests directory on Puppet master node i.e on Jump Server 
+and write code to perform the following task.
+
+Install puppet firewall module on master node i.e on Jump Server (you can install manually).
+
+There are some different applications running on all three apps. One of the applications is using port 8081 on App server 1 , 
+5008 on App server 2 and 8096 on App server 3. Complete below mentioned tasks:
+
+a. Open all incoming connections for 8081/tcp port on App Server 1 and zone should be public.
+
+b. Open all incoming connections for 5008/tcp port on App Server 2 and zone should be public.
+
+c. Open all incoming connections for 8096/tcp port on App Server 3 and zone should be public.
+
+Note: Please do not add firewall rich rules.
+
+
+Solution:
+
+
+1. To navigate to directory 
+
+cd /etc/puppetlabs/code/environments/production/manifests
+
+2. Install module puppet
+
+puppet module install puppet-firewalld --version 4.4.0
+
+3.
+
+
+class { 'firewalld': }
+
+class firewall_node1 {
+  firewalld_port { 'Open port 6400 in the public zone':
+    ensure   => present,
+    zone     => 'public',
+    port     => 5000,
+    protocol => 'tcp',
+  }
+}
+
+class firewall_node2 {
+  firewalld_port { 'Open port 6400 in the public zone':
+    ensure   => present,
+    zone     => 'public',
+    port     => 9004,
+    protocol => 'tcp',
+  }
+}
+
+class firewall_node3 {
+  firewalld_port { 'Open port 6400 in the public zone':
+    ensure   => present,
+    zone     => 'public',
+    port     => 8095,
+    protocol => 'tcp',
+  }
+}
+
+
+
+4.
+
+node 'stapp01.stratos.xfusioncorp.com' {
+  include firewall_node1 firewall_node1
+}
+
+node 'stapp02.stratos.xfusioncorp.com' {
+  include firewall_node2
+}
+
+node 'stapp03.stratos.xfusioncorp.com' {
+  include firewall_node3
+}
