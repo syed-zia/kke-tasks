@@ -1,0 +1,166 @@
+The Nautilus DevOps team had a meeting with development team last week to discuss about some new requirements for an application deployment. 
+Team is working on to setup a mariadb database server on Nautilus DB Server in Stratos Datacenter. They want to setup the same using Puppet. 
+Below you can find more details about the requirements:
+
+
+Create a puppet programming file blog.pp under /etc/puppetlabs/code/environments/production/manifests directory on puppet master node i.e on Jump Server.
+Define a class mysql_database in puppet programming code and perform below mentioned tasks:
+
+Install package mariadb-server (whichever version is available by default in yum repo) on puppet agent node i.e on DB Server also start its service.
+
+Create a database kodekloud_db9 , a database userkodekloud_gem and set passwordYchZHRcLkL for this new user also remember host should be localhost. 
+Finally grant full permissions to this newly created user on newly created database.
+
+Make sure to create single puppet programming file blog.pp to do these all tasks.
+
+
+SOlution:
+
+cat blog.pp
+
+node 'stdb01.stratos.xfusioncorp.com' {
+ include mysql_database
+}
+
+class mysql_database {
+    package {'mariadb-server':
+      ensure => installed,
+  }
+
+   service  {'mariadb':
+     ensure => running,
+     enable => true,
+   }
+
+    mysql::db { 'kodekloud_db9':
+    user => 'kodekloud_gem',
+    password => 'YchZHRcLkL',
+    host => 'localhost',
+    grant => ['ALL'],
+    }
+}
+
+node default{
+} 
+
+
+
+
+--------------------------------------------------------------------------------------------
+on host :
+----------
+puppet parser validate blog.pp
+
+puppet apply blog.pp
+
+on db server:
+-------------
+sudo puppet agent -tv
+
+to connect to newly created db from db server:
+-----------------------------------------------
+ mysql -u kodekloud_gem -p  kodekloud_db9 -h localhost
+
+=====================================================================================================================================================
+Verification and execution logs (optional):
+
+root@jump_host /etc/puppetlabs/code/environments/production/manifests# puppet apply blog.pp
+Notice: Compiled catalog for jump_host.stratos.xfusioncorp.com in environment production in 0.01 seconds
+Notice: Applied catalog in 0.01 seconds
+root@jump_host /etc/puppetlabs/code/environments/production/manifests# 
+root@jump_host /etc/puppetlabs/code/environments/production/manifests# 
+root@jump_host /etc/puppetlabs/code/environments/production/manifests# ssh peter@172.16.239.10
+The authenticity of host '172.16.239.10 (172.16.239.10)' can't be established.
+ECDSA key fingerprint is SHA256:CBjiAe+TzpQU0RBgc+aFbN6i54FWlEKwqpMZt6qVb4c.
+ECDSA key fingerprint is MD5:e7:28:77:08:49:66:40:fe:f2:ea:d4:7a:ff:19:b1:5c.
+Are you sure you want to continue connecting (yes/no)? yes
+Warning: Permanently added '172.16.239.10' (ECDSA) to the list of known hosts.
+peter@172.16.239.10's password: 
+Permission denied, please try again.
+peter@172.16.239.10's password: 
+Permission denied, please try again.
+peter@172.16.239.10's password: 
+[peter@stdb01 ~]$ sudo systemctl status mariadb
+
+We trust you have received the usual lecture from the local System
+Administrator. It usually boils down to these three things:
+
+    #1) Respect the privacy of others.
+    #2) Think before you type.
+    #3) With great power comes great responsibility.
+
+[sudo] password for peter: 
+Unit mariadb.service could not be found.
+
+[peter@stdb01 ~]$ puppet agent -tv
+Info: Creating a new RSA SSL key for stdb01.stratos.xfusioncorp.com
+Info: csr_attributes file loading from /home/peter/.puppetlabs/etc/puppet/csr_attributes.yaml
+Info: Creating a new SSL certificate request for stdb01.stratos.xfusioncorp.com
+Info: Certificate Request fingerprint (SHA256): 85:82:F3:B5:7A:04:82:D6:B2:D5:63:CE:54:4C:18:DD:D1:D6:E2:05:51:8C:CE:8E:43:CD:29:AD:2C:AD:7A:C3
+Info: Downloaded certificate for stdb01.stratos.xfusioncorp.com from https://puppet:8140/puppet-ca/v1
+Error: The certificate for 'CN=stdb01.stratos.xfusioncorp.com' does not match its private key
+Error: Could not run: The certificate for 'CN=stdb01.stratos.xfusioncorp.com' does not match its private key
+
+[peter@stdb01 ~]$ sudo puppet agent -tv
+Info: Using configured environment 'production'
+Info: Retrieving pluginfacts
+Info: Retrieving plugin
+Info: Retrieving locales
+Info: Loading facts
+Error: Could not retrieve catalog from remote server: Error 500 on SERVER: Server Error: no parameter named 'enabled' (file: /etc/puppetlabs/code/environments/production/manifests/blog.pp, line: 10) on Service[mariadb] (file: /etc/puppetlabs/code/environments/production/manifests/blog.pp, line: 10) on node stdb01.stratos.xfusioncorp.com
+Warning: Not using cache on failed catalog
+Error: Could not retrieve catalog; skipping run
+
+[peter@stdb01 ~]$ sudo systemctl status mariadb
+Unit mariadb.service could not be found.
+[peter@stdb01 ~]$ logout
+Connection to 172.16.239.10 closed.
+----------- Got error parameter 'enabled', typo replace with 'enable' ------------------------------------
+
+root@jump_host /etc/puppetlabs/code/environments/production/manifests# vi blog.pp
+
+root@jump_host /etc/puppetlabs/code/environments/production/manifests# puppet apply blog.pp
+Notice: Compiled catalog for jump_host.stratos.xfusioncorp.com in environment production in 0.01 seconds
+Notice: Applied catalog in 0.02 seconds
+
+root@jump_host /etc/puppetlabs/code/environments/production/manifests# ssh peter@172.16.239.10
+peter@172.16.239.10's password: 
+Last login: Tue Apr  6 09:16:43 2021 from jump_host.stratos.xfusioncorp.com
+
+[peter@stdb01 ~]$ sudo puppet agent -tv
+[sudo] password for peter: 
+Info: Using configured environment 'production'
+Info: Retrieving pluginfacts
+Info: Retrieving plugin
+Info: Retrieving locales
+Info: Loading facts
+Info: Caching catalog for stdb01.stratos.xfusioncorp.com
+Info: Applying configuration version '1617700745'
+Notice: /Stage[main]/Mysql_database/Package[mariadb-server]/ensure: created
+Notice: /Stage[main]/Mysql_database/Service[mariadb]/ensure: ensure changed 'stopped' to 'running'
+Info: /Stage[main]/Mysql_database/Service[mariadb]: Unscheduling refresh on Service[mariadb]
+Notice: /Stage[main]/Mysql_database/Mysql::Db[kodekloud_db9]/Mysql_database[kodekloud_db9]/ensure: created
+Notice: /Stage[main]/Mysql_database/Mysql::Db[kodekloud_db9]/Mysql_user[kodekloud_gemr@localhost]/ensure: created
+Notice: /Stage[main]/Mysql_database/Mysql::Db[kodekloud_db9]/Mysql_grant[kodekloud_gemr@localhost/kodekloud_db9.*]/ensure: created
+Notice: Applied catalog in 20.29 seconds
+
+[peter@stdb01 ~]$ systemctl status mariadb
+● mariadb.service - MariaDB database server
+   Loaded: loaded (/usr/lib/systemd/system/mariadb.service; enabled; vendor preset: disabled)
+   Active: active (running) since Tue 2021-04-06 09:19:26 UTC; 12s ago
+ Main PID: 592 (mysqld_safe)
+   CGroup: /docker/039d8bfe49869d0cde0326cd1566149ca936aa08551b1b1c4ede4fc953258a99/system.slice/mariadb.service
+           ├─592 /bin/sh /usr/bin/mysqld_safe --basedir=/usr
+           └─756 /usr/libexec/mysqld --basedir=/usr --datadir=/var/lib/mysql --plugin-dir=/usr/l...
+
+Apr 06 09:19:24 stdb01.stratos.xfusioncorp.com systemd[592]: Executing: /usr/bin/mysqld_safe --...r
+Apr 06 09:19:24 stdb01.stratos.xfusioncorp.com systemd[593]: Executing: /usr/libexec/mariadb-wa...2
+Apr 06 09:19:24 stdb01.stratos.xfusioncorp.com mysqld_safe[592]: 210406 09:19:24 mysqld_safe Lo....
+Apr 06 09:19:24 stdb01.stratos.xfusioncorp.com mysqld_safe[592]: 210406 09:19:24 mysqld_safe St...l
+Apr 06 09:19:26 stdb01.stratos.xfusioncorp.com systemd[1]: Child 593 belongs to mariadb.service
+Apr 06 09:19:26 stdb01.stratos.xfusioncorp.com systemd[1]: mariadb.service: control process exi...0
+Apr 06 09:19:26 stdb01.stratos.xfusioncorp.com systemd[1]: mariadb.service got final SIGCHLD fo...t
+Apr 06 09:19:26 stdb01.stratos.xfusioncorp.com systemd[1]: mariadb.service changed start-post -...g
+Apr 06 09:19:26 stdb01.stratos.xfusioncorp.com systemd[1]: Job mariadb.service/start finished, ...e
+Apr 06 09:19:26 stdb01.stratos.xfusioncorp.com systemd[1]: Started MariaDB database server.
+Hint: Some lines were ellipsized, use -l to show in full.
