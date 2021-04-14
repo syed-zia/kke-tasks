@@ -1,0 +1,14 @@
+Rollback a Deployment in Kubernetes:
+ 
+How do you rollback deployments in Kubernetes? (learnk8s.io)
+ 
+#to list the deployments
+Kubectl get deployment
+ 
+You can use the following command to inspect the history of your Deployment:
+
+kubectl rollout history deployment/app
+
+And you can rollback to a specific version with:
+
+kubectl rollout undo deployment/app --to-revision=1
