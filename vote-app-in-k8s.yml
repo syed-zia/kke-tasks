@@ -1,4 +1,13 @@
-Solution
+Solution:
+----------
+
+# to create service clusterip with basic skeleton which you can edit later
+
+kubectl create service clusterip redis --tcp=6379:6379 --namespace=vote --dry-run=client -o yaml > s2.yml
+
+# to create nodeport service with basic yaml skeleton
+
+kubectl create service nodeport vote-service --tcp=5000:80 --dry-run=client -o yaml > s1.yml
 
 
 apiVersion: v1
