@@ -5,3 +5,4 @@ The repository has been cloned at /usr/src/kodekloudrepos on storage server in S
 
 
 Copy sample index.html file from jump host to storage server under cloned repository at /usr/src/kodekloudrepos, add/commit the file and push to master branch.
+
